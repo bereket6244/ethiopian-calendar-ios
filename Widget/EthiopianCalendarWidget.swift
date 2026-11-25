@@ -191,7 +191,6 @@ struct EthiopianWidgetEntryView: View {
     }
 }
 
-@main
 struct EthiopianCalendarWidget: Widget {
     let kind: String = "EthiopianCalendarWidget"
 
@@ -200,7 +199,28 @@ struct EthiopianCalendarWidget: Widget {
             EthiopianWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Ethiopian Calendar")
-        .description("Shows today's Ethiopian date and upcoming holidays on the Home Screen and Lock Screen.")
-        .supportedFamilies([.systemSmall, .systemMedium, .accessoryInline, .accessoryCircular, .accessoryRectangular])
+        .description("Shows today's Ethiopian date and upcoming holidays on the Home Screen.")
+        .supportedFamilies([.systemSmall, .systemMedium])
+    }
+}
+
+struct EthiopianCalendarLockScreenWidget: Widget {
+    let kind: String = "EthiopianCalendarLockScreenWidget"
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
+            EthiopianWidgetEntryView(entry: entry)
+        }
+        .configurationDisplayName("Ethiopian Calendar Lock Screen")
+        .description("Ethiopian date and next holiday on your Lock Screen.")
+        .supportedFamilies([.accessoryInline, .accessoryCircular, .accessoryRectangular])
+    }
+}
+
+@main
+struct EthiopianCalendarWidgets: WidgetBundle {
+    var body: some Widget {
+        EthiopianCalendarWidget()
+        EthiopianCalendarLockScreenWidget()
     }
 }
