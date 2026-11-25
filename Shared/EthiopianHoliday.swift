@@ -78,8 +78,17 @@ struct EthiopianHoliday {
         let e = (2 * a + 4 * b - d + 34) % 7
         let month = (d + e + 114) / 31
         let day = (d + e + 114) % 31 + 1
-        var julian = Calendar(identifier: .julian)
-        julian.timeZone = .current
-        return julian.date(from: DateComponents(year: year, month: month, day: day))
+        // Julian Easter date → Julian day number → Gregorian calendar date.
+        let julianA = (14 - month) / 12
+        let julianY = year + 4800 - julianA
+        let julianM = month + 12 * julianA - 3
+        let jdn = day + (153 * julianM + 2) / 5 + 365 * julianY + julianY / 4 - 32083
+        let instant = Date(timeIntervalSince1970: TimeInterval(jdn - 2440588) * 86_400)
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(secondsFromGMT: 0)!
+        let components = utc.dateComponents([.year, .month, .day], from: instant)
+        var local = Calendar(identifier: .gregorian)
+        local.timeZone = .current
+        return local.date(from: components)
     }
 }
