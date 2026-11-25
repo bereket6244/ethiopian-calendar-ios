@@ -46,9 +46,55 @@ struct EthiopianWidgetEntryView: View {
         switch family {
         case .systemMedium:
             mediumView
+        case .accessoryInline:
+            inlineView
+        case .accessoryCircular:
+            circularView
+        case .accessoryRectangular:
+            rectangularView
         default:
             smallView
         }
+    }
+
+    private var inlineView: some View {
+        Text("\(entry.info.monthNameAmharic) \(entry.info.day) · \(entry.info.year) ዓ.ም.")
+            .lineLimit(1)
+            .containerBackground(for: .widget) { Color.clear }
+    }
+
+    private var circularView: some View {
+        VStack(spacing: 0) {
+            Text("\(entry.info.day)")
+                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .minimumScaleFactor(0.7)
+            Text(entry.info.monthNameAmharic)
+                .font(.system(size: 10, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .containerBackground(for: .widget) { Color.clear }
+    }
+
+    private var rectangularView: some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text("\(entry.info.monthNameAmharic) \(entry.info.day), \(entry.info.year) ዓ.ም.")
+                .font(.headline.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+            Text("\(entry.info.weekdayEnglish) · \(entry.info.monthNameEnglish) \(entry.info.day)")
+                .font(.caption2)
+                .lineLimit(1)
+            if let holiday = entry.holiday {
+                Text((holiday.isToday ? "Today: " : "Next: ") + holiday.name + (holiday.isEstimated ? " (est.)" : ""))
+                    .font(.caption2.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .containerBackground(for: .widget) { Color.clear }
     }
 
     private var smallView: some View {
@@ -154,7 +200,7 @@ struct EthiopianCalendarWidget: Widget {
             EthiopianWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("Ethiopian Calendar")
-        .description("Shows today's Ethiopian date in Amharic and English.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .description("Shows today's Ethiopian date and upcoming holidays on the Home Screen and Lock Screen.")
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryInline, .accessoryCircular, .accessoryRectangular])
     }
 }
