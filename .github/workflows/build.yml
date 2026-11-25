@@ -2,7 +2,7 @@ name: Build Unsigned IPA
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, 'preview-*' ]
   workflow_dispatch:
 
 jobs:
@@ -17,6 +17,11 @@ jobs:
 
       - name: Generate Xcode project
         run: xcodegen generate
+
+      - name: Check calendar dates and holidays
+        run: |
+          swiftc Shared/EthiopianDate.swift Shared/EthiopianHoliday.swift Tests/main.swift -o /tmp/ethiopian-calendar-checks
+          /tmp/ethiopian-calendar-checks
 
       - name: Build unsigned app
         run: |

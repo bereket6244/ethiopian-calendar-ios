@@ -4,21 +4,22 @@ import SwiftUI
 struct EthiopianEntry: TimelineEntry {
     let date: Date
     let info: EthiopianDateInfo
+    let holiday: EthiopianHoliday?
 }
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> EthiopianEntry {
-        EthiopianEntry(date: Date(), info: EthiopianDateInfo.from())
+        entry(for: Date())
     }
 
     func getSnapshot(in context: Context, completion: @escaping (EthiopianEntry) -> Void) {
         let now = Date()
-        completion(EthiopianEntry(date: now, info: EthiopianDateInfo.from(date: now)))
+        completion(entry(for: now))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<EthiopianEntry>) -> Void) {
         let now = Date()
-        let entry = EthiopianEntry(date: now, info: EthiopianDateInfo.from(date: now))
+        let entry = entry(for: now)
         let nextMidnight = Calendar.current.nextDate(
             after: now,
             matching: DateComponents(hour: 0, minute: 0, second: 5),
@@ -26,6 +27,14 @@ struct Provider: TimelineProvider {
         ) ?? Calendar.current.date(byAdding: .hour, value: 1, to: now)!
         let timeline = Timeline(entries: [entry], policy: .after(nextMidnight))
         completion(timeline)
+    }
+
+    private func entry(for date: Date) -> EthiopianEntry {
+        EthiopianEntry(
+            date: date,
+            info: EthiopianDateInfo.from(date: date),
+            holiday: EthiopianHoliday.next(onOrAfter: date)
+        )
     }
 }
 
@@ -62,6 +71,14 @@ struct EthiopianWidgetEntryView: View {
             Text("\(entry.info.monthNameEnglish) \(entry.info.year)")
                 .font(.caption2)
                 .foregroundStyle(.white.opacity(0.8))
+
+            if let holiday = entry.holiday {
+                Text((holiday.isToday ? "★ " : "Next: ") + holiday.name + (holiday.isEstimated ? " (est.)" : ""))
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Color(red: 0.98, green: 0.84, blue: 0.25))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .containerBackground(for: .widget) {
@@ -96,6 +113,18 @@ struct EthiopianWidgetEntryView: View {
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.75))
                 Spacer()
+                if let holiday = entry.holiday {
+                    Text((holiday.isToday ? "Today: " : "Next: ") + holiday.name)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(Color(red: 0.98, green: 0.84, blue: 0.25))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                    if holiday.isEstimated {
+                        Text("Estimated date")
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.75))
+                    }
+                }
                 Text(EthiopianDateInfo.gregorianString(for: entry.date))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.white.opacity(0.75))

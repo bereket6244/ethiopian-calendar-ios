@@ -11,6 +11,7 @@ struct EthiopianCalendarApp: App {
 
 struct ContentView: View {
     private let today = EthiopianDateInfo.from()
+    private let upcomingHoliday = EthiopianHoliday.next()
     @State private var displayMonth: Int
     @State private var displayYear: Int
 
@@ -34,6 +35,7 @@ struct ContentView: View {
                 VStack(spacing: 20) {
                     todayCard
                     calendarCard
+                    DateConverterView()
                     widgetTipCard
                 }
                 .padding()
@@ -68,6 +70,28 @@ struct ContentView: View {
             Text("Gregorian: \(EthiopianDateInfo.gregorianString())")
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.white.opacity(0.85))
+
+            if let holiday = upcomingHoliday {
+                VStack(spacing: 3) {
+                    Text(holiday.isToday ? "TODAY’S HOLIDAY" : "NEXT HOLIDAY")
+                        .font(.caption2.weight(.bold))
+                        .tracking(1)
+                        .foregroundStyle(Color(red: 0.98, green: 0.84, blue: 0.25))
+                    Text("\(holiday.amharicName) · \(holiday.name)")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                    if !holiday.isToday {
+                        Text(EthiopianDateInfo.gregorianString(for: holiday.date) + (holiday.isEstimated ? " · estimated" : ""))
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.8))
+                    } else if holiday.isEstimated {
+                        Text("Estimated date")
+                            .font(.caption2)
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                }
+                .padding(.top, 8)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(22)

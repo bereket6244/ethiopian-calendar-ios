@@ -85,6 +85,13 @@ struct EthiopianDateInfo {
         return ethiopicCalendar.component(.weekday, from: date)
     }
 
+    static func gregorianDate(day: Int, month: Int, year: Int) -> Date? {
+        guard year > 0, (1...13).contains(month),
+              (1...daysInMonth(month: month, year: year)).contains(day) else { return nil }
+        let components = DateComponents(year: year, month: month, day: day)
+        return ethiopicCalendar.date(from: components)
+    }
+
     static func gregorianString(for date: Date = Date()) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium

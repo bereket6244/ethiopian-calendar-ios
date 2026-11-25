@@ -22,6 +22,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.ethiopiancalendar.app
         INFOPLIST_FILE: App/Info.plist
         ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
       - target: EthiopianCalendarWidget
         embed: true

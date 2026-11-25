@@ -22,7 +22,11 @@
     .english-date { font-size: 15px; opacity: .85; margin-top: 8px; }
     .rule { height: 1px; background: #ffffff50; margin: 18px 0 12px; }
     .gregorian { font-size: 12px; font-weight: 500; opacity: .85; }
-    .calendar, .tip { background: white; padding: 16px; }
+    .holiday { margin-top: 13px; color: #f9d64c; }
+    .holiday-label { font-size: 10px; letter-spacing: 1px; font-weight: 700; }
+    .holiday-name { color: #fff; font-size: 14px; font-weight: 600; margin-top: 4px; }
+    .holiday-date { color: #ffffffcc; font-size: 11px; margin-top: 3px; }
+    .calendar, .tip, .converter { background: white; padding: 16px; }
     .month-head { display: flex; align-items: center; justify-content: space-between; text-align: center; gap: 8px; margin-bottom: 14px; }
     .month-head strong { display: block; font-size: 17px; }
     .month-head small { display: block; color: #777780; font-size: 12px; margin-top: 2px; }
@@ -39,10 +43,32 @@
     .tip-icon { color: #24a243; font-size: 24px; }
     .tip strong { font-size: 15px; }
     .tip p { font-size: 12px; line-height: 1.4; color: #777780; margin: 3px 0 0; }
+    .converter h2 { font-size: 17px; margin: 0 0 15px; }
+    .segments { display: flex; background: #eeeef0; border-radius: 9px; padding: 3px; margin-bottom: 16px; }
+    .segments button { flex: 1; border: 0; border-radius: 7px; background: transparent; padding: 8px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .segments button.active { background: white; box-shadow: 0 1px 4px #0002; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    .date-input, .ec-inputs select { border: 1px solid #d3d3d8; border-radius: 9px; background: white; color: #1c1c1e; font: inherit; font-size: 14px; padding: 10px; }
+    .date-input { width: 100%; }
+    .ec-inputs { display: flex; gap: 6px; }
+    .ec-inputs select:nth-child(1) { width: 65px; }
+    .ec-inputs select:nth-child(2) { flex: 1; min-width: 0; }
+    .ec-inputs select:nth-child(3) { width: 90px; }
+    .result { border-radius: 14px; background: #f2f2f7; padding: 14px; margin-top: 16px; }
+    .result small { font-size: 10px; color: #777780; letter-spacing: .5px; font-weight: 700; }
+    .result strong { display: block; font-size: 19px; margin-top: 4px; }
+    .result span { display: block; font-size: 13px; color: #777780; margin-top: 3px; }
+    [hidden] { display: none !important; }
     .aside { max-width: 255px; padding-top: 18px; color: #38383b; }
     .aside h2 { font-size: 18px; margin: 0 0 8px; }
     .aside p { font-size: 14px; line-height: 1.5; margin: 0; }
-    @media(max-width:730px) { body { padding: 0; display: block; background: #f2f2f7; } .layout { display: block; } .phone { width: 100%; height: 100dvh; border: 0; border-radius: 0; box-shadow: none; } .phone::before { display:none; } .screen { padding-top: 54px; } .aside { display: none; } }
+    .app-icon { display: block; width: 82px; border-radius: 18px; margin-bottom: 17px; box-shadow: 0 5px 15px #0002; }
+    .widget-preview { margin-top: 22px; border-radius: 21px; background: linear-gradient(135deg,#14733d,#0d4d2e); color: white; padding: 17px; width: 170px; min-height: 170px; display: flex; flex-direction: column; }
+    .widget-preview small { opacity: .85; font-weight: 600; }
+    .widget-preview strong { font-size: 46px; margin-top: auto; }
+    .widget-preview .widget-month { font-size: 15px; font-weight: 700; }
+    .widget-preview .widget-holiday { font-size: 11px; color: #f9d64c; font-weight: 700; margin-top: 8px; }
+    @media(max-width:730px) { body { padding: 0; display: block; background: #f2f2f7; } .layout { display: block; } .phone { width: 100%; height: auto; min-height: 100dvh; border: 0; border-radius: 0; box-shadow: none; } .phone::before { display:none; } .screen { height: auto; overflow: visible; padding-top: 54px; } .aside { display: block; max-width: none; padding: 24px 20px 38px; background: #e8e8ed; } }
   </style>
 </head>
 <body>
@@ -50,12 +76,13 @@
     <main class="phone" aria-label="Ethiopian Calendar app preview">
       <div class="screen">
         <h1>Ethiopian Calendar</h1>
-        <section class="card today" aria-label="Today"><div class="weekday" id="weekday"></div><div class="day-large" id="day"></div><div class="ethiopic-date" id="ethiopic-date"></div><div class="english-date" id="english-date"></div><div class="rule"></div><div class="gregorian" id="gregorian"></div></section>
+        <section class="card today" aria-label="Today"><div class="weekday" id="weekday"></div><div class="day-large" id="day"></div><div class="ethiopic-date" id="ethiopic-date"></div><div class="english-date" id="english-date"></div><div class="rule"></div><div class="gregorian" id="gregorian"></div><div class="holiday"><div class="holiday-label" id="holiday-label"></div><div class="holiday-name" id="holiday-name"></div><div class="holiday-date" id="holiday-date"></div></div></section>
         <section class="card calendar" aria-label="Month calendar"><div class="month-head"><button class="nav" id="prev" aria-label="Previous month">‹</button><div><strong id="month-title"></strong><small id="month-subtitle"></small></div><button class="nav" id="next" aria-label="Next month">›</button></div><div class="grid" id="grid"></div><button class="back" id="back" hidden>Back to Today</button></section>
+        <section class="card converter" aria-label="Convert dates"><h2>↔ Convert Dates</h2><div class="segments"><button class="active" id="gc-to-ec">GC → EC</button><button id="ec-to-gc">EC → GC</button></div><div id="gc-panel"><label class="form-label" for="gc-input">Gregorian date</label><input class="date-input" type="date" id="gc-input"></div><div id="ec-panel" hidden><span class="form-label">Ethiopian date</span><div class="ec-inputs"><select id="ec-day" aria-label="Ethiopian day"></select><select id="ec-month" aria-label="Ethiopian month"></select><select id="ec-year" aria-label="Ethiopian year"></select></div></div><div class="result"><small id="result-label"></small><strong id="result-primary"></strong><span id="result-secondary"></span></div></section>
         <section class="card tip"><div class="tip-icon" aria-hidden="true">▦</div><div><strong>Add Home Screen Widget</strong><p>Long-press your Home Screen, tap + (Edit &gt; Add Widget), and search for Ethiopian Calendar.</p></div></section>
       </div>
     </main>
-    <aside class="aside"><h2>Local preview</h2><p>This mirrors the current SwiftUI screen for layout and month navigation. Changes here can be reviewed on this PC before rebuilding the native app.</p></aside>
+    <aside class="aside"><img class="app-icon" src="icon.png" alt="Ethiopian Calendar app icon"><h2>Local preview</h2><p>Review the calendar, holiday banner, and both conversion directions here before rebuilding the native app.</p><div class="widget-preview" aria-label="Small widget preview"><small id="widget-weekday"></small><strong id="widget-day"></strong><div class="widget-month" id="widget-month"></div><div class="widget-holiday" id="widget-holiday"></div></div></aside>
   </div>
   <script>
     const amMonths = ['መስከረም','ጥቅምት','ኅዳር','ታኅሣሥ','ጥር','የካቲት','መጋቢት','ሚያዝያ','ግንቦት','ሰኔ','ሐምሌ','ነሐሴ','ጳጉሜ'];
@@ -64,10 +91,39 @@
     const enWeekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const shortWeekdays = ['እሑ','ሰኞ','ማክ','ረቡ','ሐሙ','ዓር','ቅዳ'];
     const ethiopic = new Intl.DateTimeFormat('en-u-ca-ethiopic', {year:'numeric',month:'numeric',day:'numeric'});
+    const islamic = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {year:'numeric',month:'numeric',day:'numeric'});
     function parts(date) { const p = Object.fromEntries(ethiopic.formatToParts(date).map(x => [x.type,x.value])); return {day:+p.day,month:+p.month,year:+p.year}; }
+    function islamicParts(date) { const p = Object.fromEntries(islamic.formatToParts(date).map(x => [x.type,x.value])); return {day:+p.day,month:+p.month,year:+p.year}; }
     function epochDay(date) { return Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())/86400000; }
     function newYear(year) { for(let day=9;day<=14;day++) { const date=new Date(year+7,8,day,12); const p=parts(date); if(p.year===year&&p.month===1&&p.day===1) return epochDay(date); } throw Error('Could not resolve Ethiopian new year'); }
     function startOfMonth(month,year) { return newYear(year)+(month-1)*30; }
+    function orthodoxEasterDay(year) {
+      const a=year%4,b=year%7,c=year%19,d=(19*c+15)%30,e=(2*a+4*b-d+34)%7;
+      const month=Math.floor((d+e+114)/31),day=(d+e+114)%31+1;
+      const jA=Math.floor((14-month)/12),jY=year+4800-jA,jM=month+12*jA-3;
+      const jdn=day+Math.floor((153*jM+2)/5)+365*jY+Math.floor(jY/4)-32083;
+      return jdn-2440588;
+    }
+    function holidayOn(date) {
+      const ec=parts(date), il=islamicParts(date), day=epochDay(date), easter=orthodoxEasterDay(date.getFullYear());
+      const fixedEC={'1-1':['Enkutatash','እንቁጣጣሽ'],'1-17':['Meskel','መስቀል'],'4-29':['Genna','ገና'],'5-11':['Timkat','ጥምቀት']};
+      const fixedGC={'3-2':['Adwa Victory Day','የዓድዋ ድል በዓል'],'5-1':['Workers’ Day','የሠራተኞች ቀን'],'5-5':['Patriots’ Victory Day','የአርበኞች ቀን']};
+      const lunar={'3-12':['Mawlid','መውሊድ'],'10-1':['Eid al-Fitr','ዒድ አልፈጥር'],'12-10':['Eid al-Adha','ዒድ አልአድሐ']};
+      const ecHoliday=fixedEC[ec.month+'-'+ec.day],gcHoliday=fixedGC[(date.getMonth()+1)+'-'+date.getDate()],ilHoliday=lunar[il.month+'-'+il.day];
+      if(ecHoliday) return {name:ecHoliday[0],amharic:ecHoliday[1],estimated:false};
+      if(gcHoliday) return {name:gcHoliday[0],amharic:gcHoliday[1],estimated:false};
+      if(day===easter) return {name:'Fasika',amharic:'ፋሲካ',estimated:false};
+      if(day===easter-2) return {name:'Siklet (Good Friday)',amharic:'ስቅለት',estimated:false};
+      if(ilHoliday) return {name:ilHoliday[0],amharic:ilHoliday[1],estimated:true};
+      return null;
+    }
+    function nextHoliday(reference) {
+      for(let offset=0;offset<430;offset++) {
+        const date=new Date(reference.getFullYear(),reference.getMonth(),reference.getDate()+offset,12);
+        const holiday=holidayOn(date);
+        if(holiday) return {...holiday,date,today:offset===0};
+      }
+    }
     const now=new Date(), today=parts(now), todayWeekday=now.getDay();
     let displayMonth=today.month, displayYear=today.year;
     document.querySelector('#weekday').textContent=`${amWeekdays[todayWeekday]} • ${enWeekdays[todayWeekday]}`;
@@ -75,6 +131,50 @@
     document.querySelector('#ethiopic-date').textContent=`${amMonths[today.month-1]} ${today.year} ዓ.ም.`;
     document.querySelector('#english-date').textContent=`${enMonths[today.month-1]} ${today.day}, ${today.year} E.C.`;
     document.querySelector('#gregorian').textContent=`Gregorian: ${new Intl.DateTimeFormat(undefined,{dateStyle:'medium'}).format(now)}`;
+    const holiday=nextHoliday(now);
+    document.querySelector('#holiday-label').textContent=holiday.today?'TODAY’S HOLIDAY':'NEXT HOLIDAY';
+    document.querySelector('#holiday-name').textContent=`${holiday.amharic} · ${holiday.name}`;
+    document.querySelector('#holiday-date').textContent=(holiday.today?'':new Intl.DateTimeFormat(undefined,{dateStyle:'medium'}).format(holiday.date))+(holiday.estimated?(holiday.today?'Estimated date':' · estimated'):'');
+    document.querySelector('#widget-weekday').textContent=amWeekdays[todayWeekday];
+    document.querySelector('#widget-day').textContent=today.day;
+    document.querySelector('#widget-month').textContent=amMonths[today.month-1];
+    document.querySelector('#widget-holiday').textContent=`${holiday.today?'★':'Next:'} ${holiday.name}${holiday.estimated?' (est.)':''}`;
+    const gcInput=document.querySelector('#gc-input'),ecDay=document.querySelector('#ec-day'),ecMonth=document.querySelector('#ec-month'),ecYear=document.querySelector('#ec-year');
+    gcInput.value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    for(let month=1;month<=13;month++) ecMonth.add(new Option(enMonths[month-1],month));
+    for(let year=1900;year<=2100;year++) ecYear.add(new Option(year,year));
+    ecMonth.value=today.month;ecYear.value=today.year;
+    function setECDays(preferred) {
+      const count=+ecMonth.value===13?newYear(+ecYear.value+1)-startOfMonth(13,+ecYear.value):30;
+      ecDay.replaceChildren();
+      for(let day=1;day<=count;day++) ecDay.add(new Option(day,day));
+      ecDay.value=Math.min(preferred,count);
+    }
+    setECDays(today.day);
+    let direction='gc';
+    function renderConversion() {
+      document.querySelector('#gc-to-ec').classList.toggle('active',direction==='gc');
+      document.querySelector('#ec-to-gc').classList.toggle('active',direction==='ec');
+      document.querySelector('#gc-panel').hidden=direction!=='gc';
+      document.querySelector('#ec-panel').hidden=direction!=='ec';
+      if(direction==='gc') {
+        const selected=new Date(gcInput.value+'T12:00:00'),ec=parts(selected);
+        document.querySelector('#result-label').textContent='ETHIOPIAN DATE';
+        document.querySelector('#result-primary').textContent=`${amMonths[ec.month-1]} ${ec.day}, ${ec.year}`;
+        document.querySelector('#result-secondary').textContent=`${enMonths[ec.month-1]} ${ec.day}, ${ec.year} E.C.`;
+      } else {
+        const date=new Date((startOfMonth(+ecMonth.value,+ecYear.value)+(+ecDay.value)-1)*86400000);
+        document.querySelector('#result-label').textContent='GREGORIAN DATE';
+        document.querySelector('#result-primary').textContent=new Intl.DateTimeFormat(undefined,{dateStyle:'medium',timeZone:'UTC'}).format(date);
+        document.querySelector('#result-secondary').textContent='G.C.';
+      }
+    }
+    document.querySelector('#gc-to-ec').onclick=()=>{direction='gc';renderConversion();};
+    document.querySelector('#ec-to-gc').onclick=()=>{direction='ec';renderConversion();};
+    gcInput.onchange=renderConversion;
+    ecDay.onchange=renderConversion;
+    ecMonth.onchange=()=>{setECDays(+ecDay.value);renderConversion();};
+    ecYear.onchange=()=>{setECDays(+ecDay.value);renderConversion();};
     function render() {
       document.querySelector('#month-title').textContent=`${amMonths[displayMonth-1]} ${displayYear}`;
       document.querySelector('#month-subtitle').textContent=enMonths[displayMonth-1];
@@ -90,6 +190,7 @@
     document.querySelector('#next').onclick=()=>{ if(displayMonth===13){displayMonth=1;displayYear++;}else displayMonth++;render(); };
     document.querySelector('#back').onclick=()=>{displayMonth=today.month;displayYear=today.year;render();};
     render();
+    renderConversion();
   </script>
 </body>
 </html>
