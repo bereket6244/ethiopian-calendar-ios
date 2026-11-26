@@ -5,7 +5,7 @@
     <key>CFBundleIdentifier</key><string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
     <key>CFBundleShortVersionString</key><string>1.2</string>
     <key>CFBundleVersion</key><string>3</string>
-    <key>WKWatchKitApp</key><true/>
+    <key>WKApplication</key><true/>
     <key>WKCompanionAppBundleIdentifier</key><string>com.ethiopiancalendar.app</string>
     <key>WKRunsIndependentlyOfCompanionApp</key><true/>
 </dict></plist>
