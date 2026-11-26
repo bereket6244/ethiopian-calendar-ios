@@ -43,7 +43,7 @@ targets:
         SKIP_INSTALL: YES
 
   EthiopianCalendarWatch:
-    type: application.watchapp2
+    type: application
     platform: watchOS
     sources:
       - path: WatchApp
